@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import SnapKit
 import Combine
 
 class ViewController: CustomCollectionViewController {
@@ -133,10 +132,12 @@ final class CustomGridCell: UICollectionViewCell {
         super.init(frame: frame)
         label = UILabel()
         label.textColor = .black
+        label.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(label)
-        label.snp.makeConstraints {
-            $0.center.equalToSuperview()
-        }
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+        ])
     }
     
     required init?(coder: NSCoder) {
@@ -154,10 +155,13 @@ final class CustomSectionHeader: UICollectionReusableView {
         super.init(frame: frame)
         label = UILabel()
         label.textColor = .black
+        label.translatesAutoresizingMaskIntoConstraints = false
         addSubview(label)
-        label.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(5.0)
-        }
+        NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 5),
+            label.trailingAnchor.constraint(equalTo: trailingAnchor),
+            label.centerYAnchor.constraint(equalTo: centerYAnchor)
+        ])
     }
     
     required init?(coder: NSCoder) {

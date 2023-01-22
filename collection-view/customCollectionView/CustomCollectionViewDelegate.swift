@@ -14,22 +14,22 @@ enum CollectionViewElementKind: String {
 // weak var 로 정의하기 위해 AnyObject conformance 추가
 protocol CustomCollectionViewDelegate: AnyObject {
     // Item Layout
-    func collectionViewItemLayout(sectionIndex: Int, section: AnyHashable) -> CustomCollectionViewItemLayout
+    func collectionViewItemLayout(sectionIndex: Int, sectionIdentifier: AnyHashable) -> CustomCollectionViewItemLayout
         
     // Item
     func registerCells(_ collectionView: UICollectionView)
-    func collectionViewCell(_ collectionView: UICollectionView, itemCellAt: IndexPath, item: AnyHashable, section: AnyHashable) -> UICollectionViewCell?
+    func collectionViewCell(_ collectionView: UICollectionView, itemCellAt: IndexPath, item: AnyHashable, sectionIdentifier: AnyHashable) -> UICollectionViewCell?
     
     // Header & Footer Layout (Optional)
-    func collectionViewSupplementaryViewLayout(sectionIndex: Int, section: AnyHashable, elementKind: CollectionViewElementKind) -> NSCollectionLayoutSize?
+    func collectionViewSupplementaryViewLayout(sectionIndex: Int, sectionIdentifier: AnyHashable, elementKind: CollectionViewElementKind) -> NSCollectionLayoutSize?
     
     // Header & Footer (Optional)
     func registerSupplementaryViews(_ collectionView: UICollectionView)
-    func collectionViewSupplementaryView(_ collectionView: UICollectionView, indexPath: IndexPath, section: AnyHashable, elementKind: CollectionViewElementKind) -> UICollectionReusableView?
+    func collectionViewSupplementaryView(_ collectionView: UICollectionView, indexPath: IndexPath, sectionIdentifier: AnyHashable, elementKind: CollectionViewElementKind) -> UICollectionReusableView?
 }
 
 extension CustomCollectionViewDelegate {
-    func collectionViewSupplementaryViewLayout(sectionIndex: Int, section: AnyHashable, elementKind: CollectionViewElementKind) -> NSCollectionLayoutSize? { nil }
+    func collectionViewSupplementaryViewLayout(sectionIndex: Int, sectionIdentifier: AnyHashable, elementKind: CollectionViewElementKind) -> NSCollectionLayoutSize? { nil }
     func registerSupplementaryViews(_ collectionView: UICollectionView) { }
-    func collectionViewSupplementaryView(_ collectionView: UICollectionView, indexPath: IndexPath, section: AnyHashable, elementKind: CollectionViewElementKind) -> UICollectionReusableView? { nil }
+    func collectionViewSupplementaryView(_ collectionView: UICollectionView, indexPath: IndexPath, sectionIdentifier: AnyHashable, elementKind: CollectionViewElementKind) -> UICollectionReusableView? { nil }
 }

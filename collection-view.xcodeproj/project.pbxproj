@@ -12,7 +12,7 @@
 		5E856CC32962B3DD0011FCB4 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E856CC22962B3DD0011FCB4 /* SceneDelegate.swift */; };
 		5E856CC52962B3DD0011FCB4 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E856CC42962B3DD0011FCB4 /* ViewController.swift */; };
 		5E856CCA2962B3DF0011FCB4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5E856CC92962B3DF0011FCB4 /* Assets.xcassets */; };
-		5E856CD52962CACF0011FCB4 /* CustomCollectionViewDisplayable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E856CD42962CACF0011FCB4 /* CustomCollectionViewDisplayable.swift */; };
+		5E856CD52962CACF0011FCB4 /* CustomCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E856CD42962CACF0011FCB4 /* CustomCollectionViewController.swift */; };
 		5EA02808296E9ECC00BD34EB /* CustomCollectionViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EA02807296E9ECC00BD34EB /* CustomCollectionViewDelegate.swift */; };
 /* End PBXBuildFile section */
 
@@ -24,7 +24,7 @@
 		5E856CC42962B3DD0011FCB4 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		5E856CC92962B3DF0011FCB4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5E856CCE2962B3DF0011FCB4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		5E856CD42962CACF0011FCB4 /* CustomCollectionViewDisplayable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCollectionViewDisplayable.swift; sourceTree = "<group>"; };
+		5E856CD42962CACF0011FCB4 /* CustomCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCollectionViewController.swift; sourceTree = "<group>"; };
 		5EA02807296E9ECC00BD34EB /* CustomCollectionViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCollectionViewDelegate.swift; sourceTree = "<group>"; };
 		AB373D4F37269D42B25E5094 /* Pods-collection-view.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-collection-view.debug.xcconfig"; path = "Target Support Files/Pods-collection-view/Pods-collection-view.debug.xcconfig"; sourceTree = "<group>"; };
 		B8BC2138DB3154F441D41569 /* Pods_collection_view.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_collection_view.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -85,7 +85,7 @@
 		5E856CD62962CBFF0011FCB4 /* customCollectionView */ = {
 			isa = PBXGroup;
 			children = (
-				5E856CD42962CACF0011FCB4 /* CustomCollectionViewDisplayable.swift */,
+				5E856CD42962CACF0011FCB4 /* CustomCollectionViewController.swift */,
 				5EA02807296E9ECC00BD34EB /* CustomCollectionViewDelegate.swift */,
 			);
 			path = customCollectionView;
@@ -213,7 +213,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5E856CC52962B3DD0011FCB4 /* ViewController.swift in Sources */,
-				5E856CD52962CACF0011FCB4 /* CustomCollectionViewDisplayable.swift in Sources */,
+				5E856CD52962CACF0011FCB4 /* CustomCollectionViewController.swift in Sources */,
 				5E856CC12962B3DD0011FCB4 /* AppDelegate.swift in Sources */,
 				5EA02808296E9ECC00BD34EB /* CustomCollectionViewDelegate.swift in Sources */,
 				5E856CC32962B3DD0011FCB4 /* SceneDelegate.swift in Sources */,

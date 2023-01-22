@@ -9,13 +9,7 @@ import UIKit
 import SnapKit
 import Combine
 
-class ViewController: UIViewController, CustomCollectionViewDisplayable {
-    
-    var collectionView: UICollectionView?
-    var sections: [SectionIdentifier] = []
-    var dataSource: DataSource?
-    
-    weak var delegate: CustomCollectionViewDelegate?
+class ViewController: CustomCollectionViewController {
     
     enum SectionType: String, Hashable {
         case grid
@@ -30,33 +24,29 @@ class ViewController: UIViewController, CustomCollectionViewDisplayable {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let collectionView = createCollectionView(with: self)
-        view.addSubview(collectionView)
-        collectionView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
+        delegate = self
         
         setData()
     }
     
     private func setData() {
-        var sections = [SectionIdentifier]()
+        var sections = [CustomCollectionViewSection]()
         
         var offset = 0
         let itemPerSection = 6
-        sections.append(SectionIdentifier(type: .grid, items: Array(offset..<offset+itemPerSection)))
+        sections.append(CustomCollectionViewSection(sectionIdentifier: SectionType.grid, items: Array(offset..<offset+itemPerSection)))
         offset += itemPerSection
-        sections.append(SectionIdentifier(type: .columnWithRatio, items: Array(offset..<offset+itemPerSection)))
+        sections.append(CustomCollectionViewSection(sectionIdentifier: SectionType.columnWithRatio, items: Array(offset..<offset+itemPerSection)))
         offset += itemPerSection
-        sections.append(SectionIdentifier(type: .columnWithHeight, items: Array(offset..<offset+itemPerSection)))
+        sections.append(CustomCollectionViewSection(sectionIdentifier: SectionType.columnWithHeight, items: Array(offset..<offset+itemPerSection)))
         offset += itemPerSection
-        sections.append(SectionIdentifier(type: .scrollWithFractional, items: Array(offset..<offset+itemPerSection)))
+        sections.append(CustomCollectionViewSection(sectionIdentifier: SectionType.scrollWithFractional, items: Array(offset..<offset+itemPerSection)))
         offset += itemPerSection
-        sections.append(SectionIdentifier(type: .scrollWithAbsolute, items: Array(offset..<offset+itemPerSection)))
+        sections.append(CustomCollectionViewSection(sectionIdentifier: SectionType.scrollWithAbsolute, items: Array(offset..<offset+itemPerSection)))
         offset += itemPerSection
-        sections.append(SectionIdentifier(type: .groupPaging, items: Array(offset..<offset+itemPerSection)))
+        sections.append(CustomCollectionViewSection(sectionIdentifier: SectionType.groupPaging, items: Array(offset..<offset+itemPerSection)))
         offset += itemPerSection
-        sections.append(SectionIdentifier(type: .custom, items: Array(offset..<offset+itemPerSection)))
+        sections.append(CustomCollectionViewSection(sectionIdentifier: SectionType.custom, items: Array(offset..<offset+itemPerSection)))
         apply(sections: sections)
     }
 }
@@ -65,7 +55,7 @@ extension ViewController: CustomCollectionViewDelegate {
         collectionView.register(CustomGridCell.self, forCellWithReuseIdentifier: CustomGridCell.reuseIdentifier)
     }
     
-    func collectionViewCell(_ collectionView: UICollectionView, itemCellAt indexPath: IndexPath, item: AnyHashable, section: AnyHashable) -> UICollectionViewCell? {
+    func collectionViewCell(_ collectionView: UICollectionView, itemCellAt indexPath: IndexPath, item: AnyHashable, sectionIdentifier: AnyHashable) -> UICollectionViewCell? {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CustomGridCell.reuseIdentifier, for: indexPath)
         if let cell = cell as? CustomGridCell,
            let item = item as? Int {
@@ -81,12 +71,12 @@ extension ViewController: CustomCollectionViewDelegate {
         return cell
     }
     
-    func collectionViewItemLayout(sectionIndex: Int, section: AnyHashable) -> CustomCollectionViewItemLayout {
-        guard let section = section as? SectionIdentifier else {
-            fatalError("unknown section idedntifier")
+    func collectionViewItemLayout(sectionIndex: Int, sectionIdentifier: AnyHashable) -> CustomCollectionViewItemLayout {
+        guard let sectionType = sectionIdentifier as? SectionType else {
+            fatalError("wrong sectionIdentifier for CustomCollectionViewController")
         }
         let layout: CustomCollectionViewItemLayout.Style
-        switch section.type {
+        switch sectionType {
         case .grid:
             layout = .grid(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1/3), heightDimension: .fractionalWidth(1/3)))
         case .columnWithRatio:
@@ -112,7 +102,7 @@ extension ViewController: CustomCollectionViewDelegate {
         return CustomCollectionViewItemLayout(style: layout, itemInset: itemInset)
     }
     
-    func collectionViewSupplementaryViewLayout(sectionIndex: Int, section: AnyHashable, elementKind: CollectionViewElementKind) -> NSCollectionLayoutSize? {
+    func collectionViewSupplementaryViewLayout(sectionIndex: Int, sectionIdentifier: AnyHashable, elementKind: CollectionViewElementKind) -> NSCollectionLayoutSize? {
         switch elementKind {
         case .sectionHeader:
             return .init(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(44.0))
@@ -124,13 +114,13 @@ extension ViewController: CustomCollectionViewDelegate {
         collectionView.register(CustomSectionHeader.self, forSupplementaryViewOfKind: CollectionViewElementKind.sectionHeader.rawValue, withReuseIdentifier: CustomSectionHeader.reuseIdentifier)
     }
     
-    func collectionViewSupplementaryView(_ collectionView: UICollectionView, indexPath: IndexPath, section: AnyHashable, elementKind: CollectionViewElementKind) -> UICollectionReusableView? {
+    func collectionViewSupplementaryView(_ collectionView: UICollectionView, indexPath: IndexPath, sectionIdentifier: AnyHashable, elementKind: CollectionViewElementKind) -> UICollectionReusableView? {
         guard elementKind == .sectionHeader,
-              let section = section as? SectionIdentifier else {
+              let section = sectionIdentifier as? SectionType else {
             return nil
         }
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: elementKind.rawValue, withReuseIdentifier: CustomSectionHeader.reuseIdentifier, for: indexPath) as? CustomSectionHeader
-        header?.label.text = section.type.rawValue
+        header?.label.text = section.rawValue
         return header
     }
 }

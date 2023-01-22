@@ -1,5 +1,5 @@
 //
-//  CustomCollectionViewDisplayable.swift
+//  CustomCollectionViewController.swift
 //  collection-view
 //
 //  Created by lauren.c on 2023/01/02.
@@ -7,35 +7,47 @@
 
 import UIKit
 
-protocol CustomCollectionViewDisplayable: AnyObject {
-    associatedtype SectionType: Hashable
+class CustomCollectionViewSection: NSObject {
+    let sectionIdentifier: AnyHashable
+    var items: [AnyHashable]
     
-    typealias SectionIdentifier = CustomCollectionViewSection<SectionType>
-    typealias Item = AnyHashable
-    
-    typealias DataSource = UICollectionViewDiffableDataSource<SectionIdentifier, Item>
-    typealias Snapshot = NSDiffableDataSourceSnapshot<SectionIdentifier, Item>
-    
-    var collectionView: UICollectionView? { get set }
-    var sections: [SectionIdentifier] { get set }
-    var dataSource: DataSource? { get set }
-    
-    var delegate: CustomCollectionViewDelegate?{ get set }
+    init(sectionIdentifier: AnyHashable, items: [AnyHashable]) {
+        self.sectionIdentifier = sectionIdentifier
+        self.items = items
+    }
 }
 
-extension CustomCollectionViewDisplayable {
+class CustomCollectionViewController: UIViewController {
+    typealias DataSource = UICollectionViewDiffableDataSource<AnyHashable, AnyHashable>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<AnyHashable, AnyHashable>
     
-    @discardableResult
-    func createCollectionView(with delegate: CustomCollectionViewDelegate) -> UICollectionView {
-        self.delegate = delegate
+    private var sections: [CustomCollectionViewSection] = []
+    private var dataSource: DataSource!
+    private var collectionView: UICollectionView!
+    
+    var delegate: CustomCollectionViewDelegate? {
+        didSet {
+            delegate?.registerCells(collectionView)
+            delegate?.registerSupplementaryViews(collectionView)
+        }
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        collectionView = createCollectionView()
+        view.addSubview(collectionView)
+        collectionView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+    }
+    
+    private func createCollectionView() -> UICollectionView {
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
-        self.collectionView = collectionView
         
         // Registration
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "default")
-        delegate.registerCells(collectionView)
-        delegate.registerSupplementaryViews(collectionView)
         
         // DataSource Configuration
         dataSource = createDataSource(with: collectionView)
@@ -44,17 +56,14 @@ extension CustomCollectionViewDisplayable {
         return collectionView
     }
     
-    // collectionView에 data를 반영하기 위한 함수.
-    func apply(sections: [SectionIdentifier]) {
-        guard let dataSource = dataSource else {
-            fatalError("should be called after `createCollectionView()`")
-        }
+    // collectionView에 data를 반영하기 위한 함수. 각 section의 sectionIdentifier는 unique해야 함
+    func apply(sections: [CustomCollectionViewSection]) {
         self.sections = sections
         
         var snapshot = Snapshot()
-        snapshot.appendSections(sections)
+        snapshot.appendSections(sections.map({ $0.sectionIdentifier }))
         for section in sections {
-            snapshot.appendItems(section.items, toSection: section)
+            snapshot.appendItems(section.items, toSection: section.sectionIdentifier)
         }
         dataSource.applySnapshotUsingReloadData(snapshot)
     }
@@ -62,7 +71,7 @@ extension CustomCollectionViewDisplayable {
     private func createDataSource(with collectionView: UICollectionView) -> DataSource {
         let dataSource = DataSource(collectionView: collectionView) { [unowned self] collectionView, indexPath, item in
             if let sectionIdentifier = self.dataSource?.snapshot().sectionIdentifiers[indexPath.section],
-               let cell = delegate?.collectionViewCell(collectionView, itemCellAt: indexPath, item: item, section: sectionIdentifier) {
+               let cell = delegate?.collectionViewCell(collectionView, itemCellAt: indexPath, item: item, sectionIdentifier: sectionIdentifier) {
                 return cell
             }
             return collectionView.dequeueReusableCell(withReuseIdentifier: "default", for: indexPath)
@@ -71,7 +80,7 @@ extension CustomCollectionViewDisplayable {
         dataSource.supplementaryViewProvider = { [unowned self] collectionView, kind, indexPath in
             if let sectionIdentifier = self.dataSource?.snapshot().sectionIdentifiers[indexPath.section],
                let kind = CollectionViewElementKind(rawValue: kind),
-               let supplementaryView = self.delegate?.collectionViewSupplementaryView(collectionView, indexPath: indexPath, section: sectionIdentifier, elementKind: kind) {
+               let supplementaryView = self.delegate?.collectionViewSupplementaryView(collectionView, indexPath: indexPath, sectionIdentifier: sectionIdentifier, elementKind: kind) {
                 return supplementaryView
             }
             return nil
@@ -83,17 +92,17 @@ extension CustomCollectionViewDisplayable {
     private func createLayout() -> UICollectionViewCompositionalLayout {
         UICollectionViewCompositionalLayout { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
             guard let delegate = self.delegate else {
-                fatalError("should called after `createCollectionView(with:)`")
+                fatalError("CustomCollectionViewController should have its delegate")
             }
-            let sectionIdentifier = self.sections[sectionIndex]
-            let section = delegate.collectionViewItemLayout(sectionIndex: sectionIndex, section: sectionIdentifier).layout()
+            let sectionIdentifier = self.sections[sectionIndex].sectionIdentifier
+            let section = delegate.collectionViewItemLayout(sectionIndex: sectionIndex, sectionIdentifier: sectionIdentifier).layout()
             
             var supplementaryItems = [NSCollectionLayoutBoundarySupplementaryItem]()
-            if let headerLayout = delegate.collectionViewSupplementaryViewLayout(sectionIndex: sectionIndex, section: sectionIdentifier, elementKind: .sectionHeader) {
+            if let headerLayout = delegate.collectionViewSupplementaryViewLayout(sectionIndex: sectionIndex, sectionIdentifier: sectionIdentifier, elementKind: .sectionHeader) {
                 let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerLayout, elementKind: CollectionViewElementKind.sectionHeader, alignment: .top)
                 supplementaryItems.append(header)
             }
-            if let footerLayout = delegate.collectionViewSupplementaryViewLayout(sectionIndex: sectionIndex, section: sectionIdentifier, elementKind: .sectionFooter) {
+            if let footerLayout = delegate.collectionViewSupplementaryViewLayout(sectionIndex: sectionIndex, sectionIdentifier: sectionIdentifier, elementKind: .sectionFooter) {
                 let footer = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: footerLayout, elementKind: CollectionViewElementKind.sectionFooter, alignment: .bottom)
                 supplementaryItems.append(footer)
             }
@@ -183,12 +192,3 @@ extension CustomCollectionViewItemLayout {
     }
 }
 
-class CustomCollectionViewSection<SectionType: Hashable>: NSObject {
-    var type: SectionType
-    var items: [AnyHashable]
-    
-    init(type: SectionType, items: [AnyHashable]) {
-        self.type = type
-        self.items = items
-    }
-}
